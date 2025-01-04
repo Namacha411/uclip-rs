@@ -10,11 +10,13 @@ use windows::Win32::System::Memory::{GlobalAlloc, GlobalLock, GlobalUnlock, GMEM
 use windows::Win32::System::Ole::CF_UNICODETEXT;
 
 fn clipboard(utf8_str: &str) -> Result<()> {
+    let mut utf8_bytes = utf8_str.as_bytes().to_vec();
+    utf8_bytes.push(0);
     unsafe {
         let len = MultiByteToWideChar(
             CP_UTF8,
             MULTI_BYTE_TO_WIDE_CHAR_FLAGS(0),
-            utf8_str.as_bytes(),
+            &utf8_bytes,
             None,
         );
         let buf_size = TryInto::<usize>::try_into(len)? * size_of::<u16>();
@@ -30,7 +32,7 @@ fn clipboard(utf8_str: &str) -> Result<()> {
         _ = MultiByteToWideChar(
             CP_UTF8,
             MULTI_BYTE_TO_WIDE_CHAR_FLAGS(0),
-            utf8_str.as_bytes(),
+            &utf8_bytes,
             p_str,
         );
         GlobalUnlock(hmem)?;
