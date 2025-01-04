@@ -9,7 +9,7 @@ use windows::Win32::System::DataExchange::{
 use windows::Win32::System::Memory::{GlobalAlloc, GlobalLock, GlobalUnlock, GMEM_FIXED};
 use windows::Win32::System::Ole::CF_UNICODETEXT;
 
-fn clipboard(utf8_str: &mut str) -> Result<()> {
+fn clipboard(utf8_str: &str) -> Result<()> {
     unsafe {
         let len = MultiByteToWideChar(
             CP_UTF8,
@@ -30,7 +30,7 @@ fn clipboard(utf8_str: &mut str) -> Result<()> {
         _ = MultiByteToWideChar(
             CP_UTF8,
             MULTI_BYTE_TO_WIDE_CHAR_FLAGS(0),
-            utf8_str.as_bytes_mut(),
+            utf8_str.as_bytes(),
             p_str,
         );
         GlobalUnlock(hmem)?;
@@ -46,5 +46,5 @@ fn clipboard(utf8_str: &mut str) -> Result<()> {
 fn main() -> Result<()> {
     let mut buf = String::new();
     std::io::stdin().read_to_string(&mut buf)?;
-    clipboard(&mut buf)
+    clipboard(&buf)
 }
